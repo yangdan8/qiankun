@@ -182,7 +182,10 @@ function getOverwrittenAppendChildOrInsertBefore(opts: {
               (element as HTMLLinkElement).rel === 'stylesheet' &&
               (element as HTMLLinkElement).href;
             if (linkElementUsingStylesheet) {
-              const { fetch } = frameworkConfiguration;
+              const fetch =
+                typeof frameworkConfiguration.fetch === 'function'
+                  ? frameworkConfiguration.fetch
+                  : frameworkConfiguration.fetch?.fn;
               stylesheetElement = convertLinkAsStyle(
                 element,
                 (styleElement) => css.process(mountDOM, styleElement, appName),
@@ -366,7 +369,8 @@ export function rebuildCSSRules(
           // eslint-disable-next-line no-plusplus
           for (let i = 0; i < cssRules.length; i++) {
             const cssRule = cssRules[i];
-            (stylesheetElement.sheet as CSSStyleSheet).insertRule(cssRule.cssText);
+            const cssStyleSheetElement = stylesheetElement.sheet as CSSStyleSheet;
+            cssStyleSheetElement.insertRule(cssRule.cssText, cssStyleSheetElement.cssRules.length);
           }
         }
       }
